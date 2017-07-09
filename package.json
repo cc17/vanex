@@ -6,6 +6,8 @@
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib --watch"
   },
+  "private": false,
+  "preferGlobal": true,
   "publishConfig": {
     "registry": "https://registry.npmjs.org/abell123456"
   },
