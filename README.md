@@ -110,7 +110,7 @@ export default {
 
 model由以下几个部分组成：
 
-- 1、name: 当前model的命名空间；
+- 1、name: 当前model的命名空间；
 - 2、constants: 不可变常量；
 - 3、data: 可操作数据部分；
 - 4、syncs: 同步操作数据部分；
