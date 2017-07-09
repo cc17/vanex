@@ -125,3 +125,5 @@ model由以下几个部分组成：
 - 更改store数据：直接赋值；
 - 触发action：直接执行store的action；
 - 性能优化：自动做掉。
+
+具体例子参考[example](https://github.com/abell123456/vane/tree/master/example).
