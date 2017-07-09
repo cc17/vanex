@@ -1,5 +1,5 @@
 import * as api from '../api';
-const STORE_KEY = 'vane';
+const STORE_KEY = 'vanex';
 
 export default {
     name: 'User',

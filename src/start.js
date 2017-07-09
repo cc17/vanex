@@ -4,21 +4,20 @@
  * 如果传递了container，则执行渲染。
  * */
 
-import {Provider} from 'mobx-react';
-
 import React, { Component } from 'react';
-import {render} from 'react-dom';
 
-import VaneRelation from './vane-relation';
-import VaneContext from './vane-context';
-import middleware from './vane-middleware';
+import {Provider} from 'mobx-react';
+import VanexContext from './vanex-context';
+import VanexRelation from './vanex-relation';
+import middleware from './vanex-middleware';
+import {render} from 'react-dom';
 
 export default({
     component: ContainerComponent,
     models,
     container,
     middlewares = [],
-    relation = new VaneRelation
+    relation = new VanexRelation
 }) => {
     if(!Array.isArray(middlewares)) {
         middlewares = [middlewares];
@@ -28,7 +27,7 @@ export default({
         middleware.use(item);
     });
 
-    const context = new VaneContext(models, {
+    const context = new VanexContext(models, {
         middleware,
         relation,
     });
@@ -47,7 +46,7 @@ export default({
         </Provider>, containerEl);
     } else {
         // 否则返回可执行组件
-        class VaneComponent extends Component {
+        class VanexComponent extends Component {
             constructor(props, context) {
                 super(props, context);
             }
@@ -61,6 +60,6 @@ export default({
             }
         }
 
-        return VaneComponent;
+        return VanexComponent;
     }
 };

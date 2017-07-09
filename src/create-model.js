@@ -1,13 +1,12 @@
 import _MobxModel, {
-    toMobxSyncActions,
-    toMobxAsyncActions,
     isMobxModelClass,
-} from './vane-model';
-
+    toMobxAsyncActions,
+    toMobxSyncActions,
+} from './vanex-model';
 import {
-    nameToUpperCase,
-    inherits,
     classCallCheck,
+    inherits,
+    nameToUpperCase,
     possibleConstructorReturn
 } from './utils';
 

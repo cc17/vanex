@@ -1,11 +1,9 @@
 const toString = Object.prototype.toString;
 
+import invariant from 'invariant';
 import {
     observable,
 } from 'mobx';
-
-import invariant from 'invariant';
-
 
 /**
  * Applies a function to every key-value pair inside an object.
@@ -43,7 +41,7 @@ export function deepMapValues(obj, fn, res = {}) {
                 } else if(curKey in result) {
                     lastRes = result[curKey]; // 让lastRes取到最后一个值
                 } else {
-                    invariant(false, `[Vane] ${curKey}属性不存在，没法直接设置。`);
+                    invariant(false, `[Vanex] ${curKey}属性不存在，没法直接设置。`);
                 }
             }
 

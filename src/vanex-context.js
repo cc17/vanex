@@ -5,11 +5,12 @@
  * 3、执行Relation的相关操作，初始化及Middleware添加hook。
  * */
 
-import {each, mapValues, isObject} from './utils';
-import MobxModel, {isMobxModelClass} from './vane-model';
-import globalMiddleware from './vane-middleware';
-import MobxRelation from './vane-relation';
+import MobxModel, {isMobxModelClass} from './vanex-model';
+import {each, isObject, mapValues} from './utils';
+
+import MobxRelation from './vanex-relation';
 import createModel from './create-model';
+import globalMiddleware from './vanex-middleware';
 
 export default class MobxContext {
     /**
