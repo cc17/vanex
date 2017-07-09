@@ -4,7 +4,7 @@
 
 ## 特点
 
-`三个API`搞定问题！
+`三个API`搞定问题！简单易上手，开发效率高。
 
 ## 如何使用
 
@@ -75,6 +75,44 @@ export default class App extends Component {
 }
 ```
 
+这里的`oberser`来自于mobx的observer，`inject`则来自于mobx-react。如果想给一个Component同时注入多个model，则可以像下面这样：  
+
+```js
+// start
+import React from 'react';
+import App from './App';
+
+import {
+    start,
+} from 'vane';
+
+// model
+import user from './models/User';
+import todos from './models/Todos';
+
+start({
+    component: App,
+    container: '#root',
+    models: {
+        user,
+        todos
+    }
+});
+```
+
+```js
+@inject(
+    stores => ({
+        user: stores.user,
+        todos: stores.todos,
+    })
+)
+@oberser
+class MyComponent extends Component{
+    // ...
+}
+```
+
 ## model
 
 代码类似于下面这样：
@@ -117,6 +155,45 @@ model由以下几个部分组成：
 - 5、effects: 异步处理部分；
 - 6、init: 初始化model后的回调方法；
 - 7、autorun: 每次对数据进行操作后都会自动执行的方法。
+
+## 开发组件
+
+有时候，我们并不想执行页面渲染，而是用Vane来开发一个组件，这时，还是可以使用`start` API，只要不传如`container`值，就会返回一个React Component。
+
+```js
+import React from 'react';
+import { render } from 'react-dom';
+import App from './App';
+
+// load middlewares
+import middlewares from './middlewares';
+
+import {
+    start,
+} from 'vane';
+
+// model
+import user from './models/User';
+import todos from './models/Todos';
+
+// relation
+import relation from './relations';
+
+// 验证start返回一个组件
+const MyComponent = start({
+    component: App,
+    models: {
+        user,
+        todos
+    },
+    middlewares,
+    relation
+});
+
+render(<MyComponent data={{a: 1}} />, document.querySelector('#root'));
+
+```
+
 
 ## 特点
 
