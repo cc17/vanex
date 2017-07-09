@@ -28,5 +28,7 @@
     "babel-register": "^6.14.0",
     "babel-runtime": "^6.23.0",
     "rimraf": "^2.6.1"
-  }
+  },
+  "author": "abell123456",
+  "license": "MIT"
 }
