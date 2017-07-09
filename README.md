@@ -32,6 +32,16 @@ start({
 });
 ```
 
+所以，只需要把你的model（类似于tarot的module）、React Container Component、Middleware（可选）、Relation传递进来，应用就能跑起来了。
+
+介绍下几个概念：  
+
+- `model`： 数据管理，区别于tarot，其只有：name命名空间以及data、action两个核心部分，action部分可以同时存放类似于Reducers以及Effects两个部分的操作（作为优化，后续这里可以做拆分）；
+
+- `middleware`：中间件，用于辅助异步处理。model重定义的一个action最终被执行的流程是这样的：首先其会被mobx的action函数包一层，以避免掉每次更改数据都会触发一次UI的重新渲染，然后其会被各个中间件依次执行，而每个中间件都有before/after/error三个操作，可以在不同的操作中对每一种操作做统一的处理；
+
+- `relation`：用于不同model之间的通信，基于监听订阅模式。
+
 > 基于vane的开发范式的`container Component`也是UI Component，UI Component像下面这样：
 
 ```js
@@ -131,6 +141,10 @@ class MyComponent extends Component{
 }
 ```
 
+mobx的observer API，用于将React Component变成observable的（动态收集依赖），在对model中的某些数据做了操作之后，如果被修改的数据刚好被该React组件使用到了，就会触发该组件的重新渲染，这也就是mobx能细粒度控制数据的原因所在。  
+
+mobx-react的inject API，用于指定将哪些model注入进React Component(this.props.modelName)，也就指定了该组件基于哪些数据做Observeable。
+
 ## model
 
 代码类似于下面这样：
@@ -173,6 +187,102 @@ model由以下几个部分组成：
 - 5、effects: 异步处理部分；
 - 6、init: 初始化model后的回调方法；
 - 7、autorun: 每次对数据进行操作后都会自动执行的方法。
+
+## 触发action
+
+### model内部触发
+
+model内部定义的Data数据，会被赋值到model实例上，所以任何在Data中定义的数据都可以通过this.xxx的方式来引用，如下：
+
+```js
+
+import fetch from 'whatwg-fetch';
+
+const pageSize = 20;
+
+export default {
+    name: 'Applications',
+
+    data: {
+        dataSource: [
+
+        ], // 列表显示的数据
+
+        detailPageVisible: false,
+
+        campaignDetail: {},
+    },
+
+    syncs: {
+        validate(value) {
+            value = value ||'';
+
+            // xxxx
+
+            return {
+                code: 200
+            };
+        },
+    },
+
+    effects:{
+        async getList(payload = {}) {
+            const {
+                currentPage = 1,
+            } = payload;
+
+            const url = `/applications/list/${currentPage}?pageSize=${pageSize}`;
+
+            let res = await fetch(url);
+
+            res = res.body;
+
+            const validateRes = this.validate(res);
+
+            if(validateRes.code == 200) {
+              this.dataSource = res.data; // 这样就会触发对应Component的重新渲染
+              this.currentPage = res.currentPage;
+              this.totalItem = res.totalItem;
+              this.totalPage = res.totalPage;
+            }
+
+            return res;
+        },
+    }
+};
+```
+可以看到，更改数据则是直接给model实例赋值即可，简单直接高效，而且多次赋值只会触发一次的重新渲染。你能想象如果一个页面是一个list列表，用户对列表中某一个进行操作后，需要修改这一项的数据及显示，只需要执行类似于：
+
+```js
+this.props.home.list[2].name = 'New Name';
+```
+
+的代码就能完成name的数据处理及页面展示更改吗？想想就激动是不是。
+
+### 组件内触发
+
+如下，简单直接：
+```js
+import { inject, observer } from 'vane';
+
+@inject('applications')
+@observer
+class Applications extends Component {
+    constructor(props, context) {
+        super(props, context);
+    }
+
+    clickHandler() {
+      this.props.applications.getList(); // 直接执行
+    }
+
+    render() {
+      return (
+        <div onClick={::this.clickHandler}></div>
+      );
+    }
+}
+```
 
 ## 开发组件
 
@@ -222,3 +332,14 @@ render(<MyComponent data={{a: 1}} />, document.querySelector('#root'));
 - 性能优化：自动做掉。
 
 具体例子参考[example](https://github.com/abell123456/vane/tree/master/example).
+
+## 为什么基于mobx的开发范式更简单高效？
+
+Mobx的实现思想和Vue几乎一样，所以其优点跟Vue也差不多：通过监听数据（对象、数组）的属性变化，可以通过直接在数据上更改就能触发UI的渲染，从而做到MVVM、响应式、上手成本低、开发效率高，在数据管理上需要再详细阐述下其区别。
+
+Redux是建议全局唯一Store的，多个Reducers也会在传递给react-redux之前被合并成一个root reducer，任何数据的更改（通过Reducer）都会通过这一个store来触发整个UI树的重新渲染，如果不做任何的性能优化（pureRender等），就算VD(Virtual Dom)有了再高的效率提升，当页面数据量、DOM数量大了，性能消耗也是非常大的。另外一点，Redux实现的对数据的管理是pull方式的，就是说其只能等待应用派发某个行为（Action），然后重新触发UI的渲染，而做不到对行为的可预期；Mobx则不一样，他是基于监听数据的属性变化来实现的，而且是多store的，对于任何的数据变更都是第一时间知道的，所以其实现方式是基于push的监听订阅模式而实现，这样，他就可以做到对数据的可预测以及细粒度的控制，甚至可以通过修改React组件生命周期的方式来减少性能的消耗，而无需使用者对这些细节关心。当然这一切肯定是有了mobx对组件做observe操作才能实现的，所以也就有了observer用的越多，应用性能越高的说法。
+
+
+## 感谢
+
+Vane的部分实现参考自MVVM框架：[mobx-roof](https://github.com/mobx-roof/mobx-roof)。
