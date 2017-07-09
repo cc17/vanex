@@ -101,6 +101,11 @@ start({
 ```
 
 ```js
+import {
+    inject,
+    observer,
+} from 'vane';
+
 @inject(
     stores => ({
         user: stores.user,
@@ -109,7 +114,20 @@ start({
 )
 @oberser
 class MyComponent extends Component{
-    // ...
+    constructor(props, context) {
+        super(props, context);
+    }
+
+    render() {
+        const {
+            user,
+            todos,
+        } = this.props;
+
+        return (
+            <div>{user.name}</div>
+        );
+    }
 }
 ```
 
