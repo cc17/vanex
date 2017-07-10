@@ -2,7 +2,7 @@
 
 基于`mobx & mobx-react`的React store管理框架，提供简单快捷的开发范式。使用模式类似dva，但用起来比dva更简单，开发效率更高！  
 
-github地址：https://github.com/abell123456/vanex 
+github地址：https://github.com/abell123456/vanex
 
 ## 特点
 
@@ -259,7 +259,21 @@ export default {
 this.props.home.list[2].name = 'New Name';
 ```
 
-的代码就能完成name的数据处理及页面展示更改吗？想想就激动是不是。
+的代码就能完成name的数据处理及页面展示更改吗？想想就激动是不是。  
+
+有的同学会有：`syncs和effects里面多次对model直接赋值会触发UI的多次渲染`的担心，其实不会的，我们队syncs以及effects里面的每一个方法都用会使用mobx的`action`做了一层包装，从而来避免这个问题。  
+
+另外，我们也提供`this.set()`的辅助方法来方便的为model改值，所以你还可以这样做：
+
+```js
+this.set({
+  dataSource: res.data,
+  currentPage: res.currentPage,
+  totalItem: res.totalItem,
+  totalPage: res.totalPage,
+});
+```
+这里会使用mobx的`runInAction`来统一执行，从而保证UI渲染只执行一次。
 
 ### 组件内触发
 
