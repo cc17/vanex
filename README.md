@@ -343,7 +343,9 @@ Redux是建议全局唯一Store的，多个Reducers也会在传递给react-redux
 
 ## 加群交流
 
-![vanex使用交流群](https://github.com/abell123456/vanex/blob/master/img/IMG_1434.JPG)
+![vanex使用交流群](https://github.com/abell123456/vanex/blob/master/img/IMG_1434.JPG)  
+
+或者加我微信联系加群：`13332922437`。
 
 ## 感谢
 
