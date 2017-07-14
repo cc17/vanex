@@ -364,3 +364,7 @@ Redux是建议全局唯一Store的，多个Reducers也会在传递给react-redux
 ## 感谢
 
 Vanex的部分实现参考自MVVM框架：[mobx-roof](https://github.com/mobx-roof/mobx-roof)。
+
+## 落地
+
+- 1、[内容创作投放平台](https://kol.alibaba.com)
