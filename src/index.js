@@ -1,10 +1,11 @@
 import * as mobx from 'mobx';
 import * as mobxReact from 'mobx-react';
 
+import start, { addModel } from './start';
+
 import Relation from './vanex-relation';
 import createModel from './create-model';
 import extendModel from './extend-model';
-import start from './start';
 
 export default {
     ...mobx,
@@ -13,4 +14,5 @@ export default {
     extendModel,
     start,
     Relation,
+    addModel,
 };

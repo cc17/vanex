@@ -3,9 +3,12 @@ import React, {
     PropTypes
 } from 'react';
 import {
-    observer,
+    addModel,
     inject,
+    observer,
 } from '../../lib';
+
+import newAdded from '../models/newAdded';
 
 @inject('user')
 @observer
@@ -43,5 +46,11 @@ export default class UserLogin extends Component {
                 </div>
             </div>
         );
+    }
+
+    componentDidMount() {
+        addModel({
+            newAdded,
+        });
     }
 }

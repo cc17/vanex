@@ -1,30 +1,25 @@
-import React from 'react';
-import { render } from 'react-dom';
 import App from './App';
-
+import React from 'react';
 // load middlewares
 import middlewares from './middlewares';
-
+// relation
+import relation from './relations';
+import { render } from 'react-dom';
 import {
     start,
 } from '../lib';
-
+import todos from './models/Todos';
 // model
 import user from './models/User';
-import todos from './models/Todos';
 
-// relation
-import relation from './relations';
-
-// 验证start返回一个组件
-const MyComponent = start({
+// 直接渲染
+start({
     component: App,
     models: {
         user,
         todos
     },
     middlewares,
-    relation
+    relation,
+    container: '#root'
 });
-
-render(<MyComponent />, document.querySelector('#root'));

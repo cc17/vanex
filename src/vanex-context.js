@@ -23,8 +23,36 @@ export default class MobxContext {
     constructor(models = {}, opts = {}) {
         this._middleware = opts.middleware || globalMiddleware;
         this._relation = opts.relation || new MobxRelation;
+        this._models = {};
 
-        this._data = mapValues(models, Model => {
+        this.models = models;
+
+        this.setData(models);
+
+        this._addRelationMiddleware();
+
+        // trigger relation init function in async
+        setTimeout(() => {
+            this._relation.triggerInit(this);
+            this._relation.triggerAutorun(this);
+        });
+    }
+
+    set models(models) {
+        // 校验是否重名
+        Object.keys(models).some(key => {
+            if(key in this._models) {
+                console.error(`[vanex]: You have already existed the same model key: '${key}'`);
+                
+                return true;
+            }
+        });
+
+        this._models = Object.assign((this._models || {}), models);
+    }
+
+    setData(models) {
+        this._data = Object.assign({}, this._data, mapValues(models, Model => {
             if(isObject(Model)) {
                 Model = createModel(Model);
             }
@@ -40,15 +68,13 @@ export default class MobxContext {
                 Model.middleware = this._middleware;
                 return Model;
             }
-        });
+        }));
+    }
 
-        this._addRelationMiddleware();
-
-        // trigger relation init function in async
-        setTimeout(() => {
-            this._relation.triggerInit(this);
-            this._relation.triggerAutorun(this);
-        });
+    addModel(models) {
+        this.models = models;
+        
+        this.setData(models);
     }
 
     _addRelationMiddleware() {
