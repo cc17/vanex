@@ -182,7 +182,7 @@ export default {
 
 model由以下几个部分组成：
 
-- 1、name: 当前model的命名空间；
+- 1、name: 当前model的命名空间；
 - 2、constants: 不可变常量；
 - 3、data: 可操作数据部分；
 - 4、syncs: 同步操作数据部分；
@@ -302,7 +302,7 @@ class Applications extends Component {
 
 ## 开发组件
 
-有时候，我们并不想执行页面渲染，而是用Vanex来开发一个组件，这时，还是可以使用`start` API，只要不传如`container`值，就会返回一个React Component。
+有时候，我们并不想执行页面渲染，而是用Vanex来开发一个组件，这时，还是可以使用`start` API，只要不传如`container`值，就会返回一个React Component。
 
 ```js
 import React from 'react';
@@ -359,7 +359,7 @@ Redux是建议全局唯一Store的，多个Reducers也会在传递给react-redux
 
 ![vanex使用交流群](https://github.com/abell123456/vanex/blob/master/img/IMG_1434.JPG)  
 
-或者加我微信联系加群：`13332922437`。
+或者加我微信联系加群：`13332922437`。
 
 ## 感谢
 
