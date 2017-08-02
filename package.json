@@ -6,7 +6,6 @@
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib --watch"
   },
-  "private": true,
   "preferGlobal": false,
   "repository": {
     "type": "git",
