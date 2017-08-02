@@ -1,6 +1,6 @@
 {
   "name": "vanex",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Development library based on mobx.",
   "main": "./index.js",
   "scripts": {
