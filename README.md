@@ -1,8 +1,9 @@
-# vanex
+# @alife/vanex
 
 基于`mobx & mobx-react`的React store管理框架，提供简单快捷的开发范式。使用模式类似dva，但用起来比dva更简单，开发效率更高！  
 
-github地址：https://github.com/abell123456/vanex
+gitlab地址:  http://gitlab.alibaba-inc.com/vanex/vanex  
+example地址: http://gitlab.alibaba-inc.com/vanex/vanex/example  
 
 ## 特点
 
@@ -18,7 +19,7 @@ import App from './App';
 
 import {
     start,
-} from 'vanex';
+} from '@alife/vanex';
 
 // model
 import user from './models/User';
@@ -49,9 +50,6 @@ start({
 ```js
 import React, {Component, PropTypes} from 'react';
 
-// load middlewares
-import './middlewares';
-
 // components
 import UserLogin from './components/UserLogin';
 import UserDetail from './components/UserDetail';
@@ -60,7 +58,7 @@ import Todos from './components/Todos';
 import {
     inject,
     observer,
-} from 'vanex';
+} from '@alife/vanex';
 
 // 注意先observer，后inject
 @inject('user')
@@ -96,7 +94,7 @@ import App from './App';
 
 import {
     start,
-} from 'vanex';
+} from '@alife/vanex';
 
 // model
 import user from './models/User';
@@ -116,7 +114,7 @@ start({
 import {
     inject,
     observer,
-} from 'vanex';
+} from '@alife/vanex';
 
 @inject(
     stores => ({
@@ -279,7 +277,7 @@ this.set({
 
 如下，简单直接：
 ```js
-import { inject, observer } from 'vanex';
+import { inject, observer } from '@alife/vanex';
 
 @inject('applications')
 @observer
@@ -300,7 +298,115 @@ class Applications extends Component {
 }
 ```
 
-## 开发组件
+## Vanex插件机制
+
+Vanex支持`插件`机制，使用的方式如下：
+```js
+import { start, use } from '@alife/vanex';
+
+import effectPlugin from './effect-plugin';
+
+use(effectPlugin);
+
+// start代码
+```
+
+目前已经提供的插件列表如下：
+
+### onStateChange
+
+用于监听数据发生改变的时候的触发回调。格式如下：
+```js
+export default {
+    onStateChange: [event => {
+        console.log(event);
+    }]
+};
+```
+
+### onEffect
+
+用于处理`异步执行`执行`前(before)、后(after)、错误(error)`以及过滤哪些effects执行该回调，它在执行的时候其实是以中间件的形式来执行的。如果有类似于`每次请求都自带csrfToken`的需求，则可以在`before`钩子函数中组装。  
+
+具体使用如下：
+
+```js
+// Before exec action
+function preLogger({
+    type,
+    payload
+}) {
+    console.log(`[${type}] params: `, payload);
+
+    payload。csrfToken = 'xxx'; // 这里的更改会对请求参数生效
+
+    return payload;
+}
+
+// Action exec fail
+function errorLogger({
+    type,
+    payload
+}) {
+    console.log(`[${type}] error: `, payload.message);
+    return payload;
+}
+
+// After exec action
+function afterLogger({
+    type,
+    payload
+}) {
+    console.log(`[${type}] result: `, payload);
+    return payload;
+}
+
+export default {
+    filter({
+            type
+        }) {
+        return /^User/.test(type); // 只针对Model名字是User的进行下面钩子函数的执行
+    },
+    before: preLogger,
+    after: afterLogger,
+    error: errorLogger,
+};
+```
+
+### onAction
+
+用于在执行`syncs` Action之后触发。格式如下：
+
+```js
+export default {
+    onAction: [(
+        actionName,
+        actionArgs,
+        result) => {
+            console.log(`当前执行Action的名字：${actionName}`);
+            console.log(`当前执行Action的参数：${actionArgs}`);
+            console.log(`当前执行Action的结果：${result}`);
+        }]
+};
+
+```
+
+### getActionState
+
+这个并不是Vanex插件，但是用于解决在组件中获取`当前model中某个effect是否正在发送请求`的问题，而这个状态可以用于`方便的控制Loading组件是否可见`。因为这种需求非常普遍，所以Vanex直接内置到内部实现中。使用示例如下：
+
+```js
+const {
+    user
+} = this.props;
+
+const {
+    loading: loginLoading,
+    error: loginError
+} = user.getActionState('user/login');
+```
+
+## 用于开发组件
 
 有时候，我们并不想执行页面渲染，而是用Vanex来开发一个组件，这时，还是可以使用`start` API，只要不传如`container`值，就会返回一个React Component。
 
@@ -314,7 +420,12 @@ import middlewares from './middlewares';
 
 import {
     start,
-} from 'vanex';
+    use,
+} from '@alife/vanex';
+
+use({
+    onEffect: middlewares
+});
 
 // model
 import user from './models/User';
@@ -330,7 +441,6 @@ const MyComponent = start({
         user,
         todos
     },
-    middlewares,
     relation
 });
 
@@ -347,19 +457,11 @@ render(<MyComponent data={{a: 1}} />, document.querySelector('#root'));
 - 触发action：直接执行store的action；
 - 性能优化：自动做掉。
 
-具体例子参考[example](https://github.com/abell123456/vanex/tree/master/example).
-
 ## 为什么基于mobx的开发范式更简单高效？
 
 Mobx的实现思想和Vue几乎一样，所以其优点跟Vue也差不多：通过监听数据（对象、数组）的属性变化，可以通过直接在数据上更改就能触发UI的渲染，从而做到MVVM、响应式、上手成本低、开发效率高，在数据管理上需要再详细阐述下其区别。
 
 Redux是建议全局唯一Store的，多个Reducers也会在传递给react-redux之前被合并成一个root reducer，任何数据的更改（通过Reducer）都会通过这一个store来触发整个UI树的重新渲染，如果不做任何的性能优化（pureRender等），就算VD(Virtual Dom)有了再高的效率提升，当页面数据量、DOM数量大了，性能消耗也是非常大的。另外一点，Redux实现的对数据的管理是pull方式的，就是说其只能等待应用派发某个行为（Action），然后重新触发UI的渲染，而做不到对行为的可预期；Mobx则不一样，他是基于监听数据的属性变化来实现的，而且是多store的，对于任何的数据变更都是第一时间知道的，所以其实现方式是基于push的监听订阅模式而实现，这样，他就可以做到对数据的可预测以及细粒度的控制，甚至可以通过修改React组件生命周期的方式来减少性能的消耗，而无需使用者对这些细节关心。当然这一切肯定是有了mobx对组件做observe操作才能实现的，所以也就有了observer用的越多，应用性能越高的说法。
-
-## 加群交流
-
-![vanex使用交流群](https://github.com/abell123456/vanex/blob/master/img/IMG_1434.JPG)  
-
-或者加我微信联系加群：`13332922437`。
 
 ## 感谢
 

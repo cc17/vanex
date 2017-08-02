@@ -22,9 +22,6 @@ export default function createModel({
     effects = {}, // 异步处理数据
     ...others,
 }, Parent = _MobxModel) {
-    const mobxSyncs = toMobxSyncActions(syncs);
-    const mobxAsyncs = toMobxAsyncActions(effects);
-
     if (!isMobxModelClass(Parent)) {
         throw new Error('[createModel] Parent class must extend From MobxModel.');
     }
@@ -32,12 +29,17 @@ export default function createModel({
         throw new Error('[createModel] need a name.');
     }
 
-    function MobxModel(_initData = {}, middleware, _autorun, _constants) {
+    function MobxModel(_initData = {}, middleware, plugin, _autorun, _constants) {
         classCallCheck(this, MobxModel);
 
         if (typeof data === 'function') {
             throw new Error('[createModel] `data` can not be a function, please use `init` instead.');
         }
+
+        const mobxSyncs = toMobxSyncActions(name, syncs, plugin);
+        const mobxAsyncs = toMobxAsyncActions(name, effects, plugin);
+
+        Object.assign(this, mobxSyncs, mobxAsyncs);
 
         // Object.getPrototypeOf(MobxModel)指向_MobxModel的构造函数
         const res = possibleConstructorReturn(
@@ -49,6 +51,7 @@ export default function createModel({
                     ..._initData
                 },
                 middleware,
+                plugin,
                 {
                     ...autorun,
                     ..._autorun
@@ -62,10 +65,12 @@ export default function createModel({
 
         return res;
     }
+
     MobxModel.uuid = ++uuid;
     MobxModel.syncs = syncs;
     MobxModel.effects = effects;
     MobxModel.autorun = autorun;
+
     inherits(MobxModel, Parent);
 
     // Define MobxModel name
@@ -78,7 +83,7 @@ export default function createModel({
         },
     });
 
-    MobxModel.prototype = Object.assign(MobxModel.prototype, others, privates, mobxSyncs, mobxAsyncs);
+    MobxModel.prototype = Object.assign(MobxModel.prototype, others, privates);
 
     return MobxModel;
 }

@@ -6,9 +6,27 @@ import {
     addModel,
     inject,
     observer,
+    Provider
 } from '../../lib';
 
 import newAdded from '../models/newAdded';
+
+
+// 测试多个model的情形
+import {
+    start,
+    use,
+} from '../../lib';
+
+import todos from '../models/Todos';
+import TodosCom from './Todos';
+
+const LastTodoCom = start({
+    component: TodosCom,
+    models: {
+        todos,
+    },
+});
 
 @inject('user')
 @observer
@@ -28,7 +46,7 @@ export default class UserLogin extends Component {
         const {
             loading: loginLoading,
             error: loginError
-        } = user.getActionState('login');
+        } = user.getActionState('user/login');
 
         const errorVal = user.loginError;
 
@@ -44,13 +62,17 @@ export default class UserLogin extends Component {
                         : <span style={{ color: 'red' }}>{(loginError && loginError.message) || errorVal}</span>
                     }
                 </div>
+
+                <LastTodoCom ref='todos' />
             </div>
         );
     }
 
     componentDidMount() {
-        addModel({
-            newAdded,
-        });
+        // addModel({
+        //     newAdded,
+        // });
+
+        console.log('123:', 'add' in this.refs.todos.mobxStores.todos);
     }
 }
