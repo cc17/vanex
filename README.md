@@ -180,7 +180,7 @@ export default {
 
 model由以下几个部分组成：
 
-- 1、name: 当前model的命名空间；
+- 1、name: 当前model的命名空间；
 - 2、constants: 不可变常量；
 - 3、data: 可操作数据部分；
 - 4、syncs: 同步操作数据部分；
@@ -408,7 +408,7 @@ const {
 
 ## 用于开发组件
 
-有时候，我们并不想执行页面渲染，而是用Vanex来开发一个组件，这时，还是可以使用`start` API，只要不传如`container`值，就会返回一个React Component。
+有时候，我们并不想执行页面渲染，而是用Vanex来开发一个组件，这时，还是可以使用`start` API，只要不传如`container`值，就会返回一个React Component。
 
 ```js
 import React from 'react';
@@ -462,6 +462,12 @@ render(<MyComponent data={{a: 1}} />, document.querySelector('#root'));
 Mobx的实现思想和Vue几乎一样，所以其优点跟Vue也差不多：通过监听数据（对象、数组）的属性变化，可以通过直接在数据上更改就能触发UI的渲染，从而做到MVVM、响应式、上手成本低、开发效率高，在数据管理上需要再详细阐述下其区别。
 
 Redux是建议全局唯一Store的，多个Reducers也会在传递给react-redux之前被合并成一个root reducer，任何数据的更改（通过Reducer）都会通过这一个store来触发整个UI树的重新渲染，如果不做任何的性能优化（pureRender等），就算VD(Virtual Dom)有了再高的效率提升，当页面数据量、DOM数量大了，性能消耗也是非常大的。另外一点，Redux实现的对数据的管理是pull方式的，就是说其只能等待应用派发某个行为（Action），然后重新触发UI的渲染，而做不到对行为的可预期；Mobx则不一样，他是基于监听数据的属性变化来实现的，而且是多store的，对于任何的数据变更都是第一时间知道的，所以其实现方式是基于push的监听订阅模式而实现，这样，他就可以做到对数据的可预测以及细粒度的控制，甚至可以通过修改React组件生命周期的方式来减少性能的消耗，而无需使用者对这些细节关心。当然这一切肯定是有了mobx对组件做observe操作才能实现的，所以也就有了observer用的越多，应用性能越高的说法。
+
+## 加群交流
+
+![vanex使用交流群](https://github.com/abell123456/vanex/blob/master/img/IMG_1434.JPG)  
+
+或者加我微信联系加群：`13332922437`。
 
 ## 感谢
 
