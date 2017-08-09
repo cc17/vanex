@@ -7,7 +7,14 @@
 
 `tag:improved`   
 
-- 更优雅的实现set设置值
+- model set设置实现优化
+
+0.1.4
+-----
+
+`tag:feature`   
+
+- 插件机制优化
 
 0.1.2
 -----
