@@ -18,6 +18,9 @@ export default {
         loginError: '',
         habits: [],
         from: null,
+        user: {
+            name: '',
+        },
     },
 
     init() {
@@ -39,6 +42,7 @@ export default {
                 username: null,
                 password: null,
                 userId: null,
+                'user.name': null
             });
         },
     },
@@ -54,6 +58,7 @@ export default {
                     loginError: null,
                     username,
                     password,
+                    'user.name': username
                 };
 
                 this.set(obj);
